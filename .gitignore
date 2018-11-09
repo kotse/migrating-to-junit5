@@ -1,0 +1,20 @@
+# Eclipse
+.classpath
+.project
+.settings/
+/runConfigurations
+^bin/
+
+# IntelliJ
+.idea/**
+!.idea/runConfigurations/
+!.idea/runConfigurations/*shared*.xml
+*.iml
+_.swp
+
+# Mac
+.DS_Store
+
+# Maven
+target/
+*.class
