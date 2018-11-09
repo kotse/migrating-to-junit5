@@ -1,21 +1,22 @@
 package bgjug.hol.junit5.migration.eticket;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 
-@RunWith(MockitoJUnitRunner.class)
-public class StamperTest {
+@ExtendWith(MockitoExtension.class)
+class StamperTest {
 
     private static final LocalDateTime NOW = LocalDateTime.now();
     private static final LocalDateTime AN_HOUR_AGO = NOW.minusHours(1);
@@ -29,32 +30,37 @@ public class StamperTest {
     @Mock
     private StamperRepo stamperRepo;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    void setUp() throws Exception {
         stamper = new Stamper(stamperRepo);
     }
 
-    @Test
-    public void whenValidTicket_shouldStampIt() {
-        BDDMockito.given(stamperRepo.stampExistsFor(VALID_TICKET, NOW)).willReturn(false);
+    @Nested
+    class whenValidTicket {
 
-        Optional<Stamp> actual = stamper.stamp(VALID_TICKET, NOW);
-        Stamp expected = new Stamp(VALID_TICKET.getTicketCode(), NOW);
+        @BeforeEach
+        void setUp() {
+            BDDMockito.given(stamperRepo.stampExistsFor(VALID_TICKET, NOW)).willReturn(false);
+        }
 
-        assertEquals(expected, actual.get());
+        @Test
+        void shouldStampIt() {
+            Optional<Stamp> actual = stamper.stamp(VALID_TICKET, NOW);
+            Stamp expected = new Stamp(VALID_TICKET.getTicketCode(), NOW);
+
+            assertEquals(expected, actual.get());
+        }
+
+        @Test
+        void shouldStoreIt() {
+            Optional<Stamp> stamp = stamper.stamp(VALID_TICKET, NOW);
+
+            BDDMockito.then(stamperRepo).should().store(stamp.get());
+        }
     }
 
     @Test
-    public void whenValidTicket_shouldStoreIt() {
-        BDDMockito.given(stamperRepo.stampExistsFor(VALID_TICKET, NOW)).willReturn(false);
-
-        Optional<Stamp> stamp = stamper.stamp(VALID_TICKET, NOW);
-
-        BDDMockito.then(stamperRepo).should().store(stamp.get());
-    }
-
-    @Test
-    public void whenNotValidTicket_shouldNotStampAndStore() {
+    void whenNotValidTicket_shouldNotStampAndStore() {
         Optional<Stamp> stamp = stamper.stamp(NOT_VALID_TICKET, NOW);
 
         assertEquals(Optional.empty(), stamp);
@@ -62,7 +68,7 @@ public class StamperTest {
     }
 
     @Test
-    public void whenAlreadyStamped_shouldNotStampAgain() {
+    void whenAlreadyStamped_shouldNotStampAgain() {
         BDDMockito.given(stamperRepo.stampExistsFor(VALID_TICKET, NOW)).willReturn(true);
 
         Optional<Stamp> stamp = stamper.stamp(VALID_TICKET, NOW);

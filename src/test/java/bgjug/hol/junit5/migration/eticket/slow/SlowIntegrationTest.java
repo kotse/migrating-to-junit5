@@ -6,6 +6,6 @@ public class SlowIntegrationTest {
 
     @Test
     public void slowTestOne() throws InterruptedException {
-        Thread.sleep(2000);
+        Thread.sleep(12000);
     }
 }
