@@ -9,9 +9,9 @@ To perform a migration of the sample project just follow the step by step instru
 ## Step by step guide
 
  
-**1. Clone repo**: [https://github.com/kotse/migrating-to-junit5](https://github.com/kotse/migrating-to-junit5)
-**2. Add project to you IDE**
-**3. Expore**
+**1. Clone repo**: [https://github.com/kotse/migrating-to-junit5](https://github.com/kotse/migrating-to-junit5).  
+**2. Add project to you IDE**  
+**3. Explore**
 
 Explore the project a bit, take a look at the code and the tests, make sure tests run both in IDE and maven (`mvn test`)
 
