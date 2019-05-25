@@ -128,9 +128,11 @@ This is not valid code anymore:
 @Test(expected = DuplicateStampException.class)
 ```
 
-Change the test to use the new JUnit `assertThrows` instead. [Here is a link to JUnit 5 Javadoc for all new Assertions can be found here](https://junit.org/junit5/docs/current/api/org/junit/jupiter/api/Assertions.html)
+Change the test to use the new JUnit `assertThrows` instead. [Here is a link to JUnit 5 Javadoc for all new Assertions](https://junit.org/junit5/docs/current/api/org/junit/jupiter/api/Assertions.html)
 
-After you are finished - remove the `@Disabled` from the test
+After you are finished - remove the `@Disabled` from the test.
+
+Run all tests in you IDE or Maven, check they are all still being run.
 
 **8. StamperTest**
 
@@ -187,42 +189,51 @@ Again migrate like the others.
 
 Note that the tests are very similar. **Perhaps we can parameterize them?**
 
+Before we change existing ones, lets make a simpler **ParameterizedTest** first.
+
+**9.1 Test dependency**
+
 There is a dependency you need to add to your pom for this to happen. Check out the JUnit5 User Guide to find the dependency and the the `@ParameterizedTest` and other annotations needed.
 
-Try to work out how to use `@MethodSource` or one of the other Sources to inject the paramers in a test.
+**9.2 Write a test for valid ticket codes**
 
-**9.1 Make one parameterized test for all valid tickets and another for all invalid ones**
+There is a `TODO` left in the `TicketTest` - a few test cases we have missed to implement!
+Let's try to make a test for them.
 
 For that you will need two things:
+ - a "test template" method that will receive valid or invalid ticket codes as a parameter
+ - a place where we get those (string values) - one of the [Sources of Arguments](https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests-sources). Can you guess which one?
+
+**9.3 Make one parameterized test for all valid tickets and another for all invalid ones**
+
+For that you will again need two things:
  - a "test template" method that will receive valid or invalid ticket parameters
  - another (static) method, that will provide those parameters and will be called via `@MethodSource`
 
-**9.2 Combine both tests in one**
+**9.4 Combine valid and invalid ticket tests in one**
 
 You will need to modify the test template method so it accepts another boolean parameter.
 
 You will also need a new method to provide `Arguments` objects instead of just `LocalDateTime` ones. You can use one of `Arguments` [factory methods to create those](https://junit.org/junit5/docs/current/api/org/junit/jupiter/params/provider/Arguments.html).
 
-**9.3 Example solution**
+**9.5 Example solution**
 
 ```java
 static Stream<Arguments> ticketsTestDataProvider() {
    return Stream.of(
            Arguments.of("Ticket bought an hour ago is valid", AN_HOUR_AGO, IS_VALID),
-           Arguments.of("Ticket bought in the future cannot be valid", FUTURE, !IS_VALID),
-           Arguments.of("Ticket bought in more than two years ago is not valid anymore", MORE_THEN_TWO_YEARS, !IS_VALID),
-           Arguments.of("Ticket exactly two years ago is still (barely) valid", TWO_YEAR_OLD, IS_VALID)
+           ...
    );
 }
 
 @ParameterizedTest(name = "{0}")
 @MethodSource(value = "ticketsTestDataProvider")
 void ticketAreNotValid(String label, LocalDateTime time, boolean isValid) {
-   Ticket ticket = new Ticket("code", time);
-
-   assertEquals(isValid, !ticket.isNotValid(NOW));
+   ...
 }
 ```
+
+Note the parameters passed to the `@ParameterizedTest` annotation. You can customize the name.
 
 **10. Slow Tests**
 
@@ -243,6 +254,5 @@ Notice that when you run it with maven (`maven test`), **tests will run one by o
 ```
 
 If you run maven build again, you will see the slow tests being run in **parallel** and build will be twice as fast.
-
 
 **11. Optional**: If you want to continue - migrate slow tests, tag them with the new `@Tag` annotation and configure maven to run all tests with or without the tag

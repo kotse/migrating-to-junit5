@@ -11,6 +11,18 @@ public class Ticket {
     public Ticket(String ticketCode, LocalDateTime issuedAt) {
         this.ticketCode = ticketCode;
         this.issuedAt = issuedAt;
+
+        checkTicketCode(ticketCode);
+    }
+
+    private void checkTicketCode(String ticketCode) {
+        if (ticketCode == null || ticketCode.isEmpty()) {
+            throw new InvalidTickeException("ticket code should not be null or empty");
+        }
+
+        if (ticketCode.length() < 8) {
+            throw new InvalidTickeException("ticket code should be at least 8 characters long");
+        }
     }
 
     public String getTicketCode() {
