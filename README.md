@@ -187,15 +187,17 @@ While it is not a big change in a simple tests like this, this is a powerful fea
 
 Again migrate like the others.
 
+Note some code stopped compiling! There is a breaking change between JUnit 4 and 5. It is possible to have an optional parameter to each assertion method that will display a message when assertion fails. You need to move those as the last parameter of the method instead of the first to make it compile.
+
 Note that the tests are very similar. **Perhaps we can parameterize them?**
 
-Before we change existing ones, lets make a simpler **ParameterizedTest** first.
+Before we change existing ones, lets make a new simpler **ParameterizedTest** first.
 
 **9.1 Test dependency**
 
 There is a dependency you need to add to your pom for this to happen. Check out the JUnit5 User Guide to find the dependency and the the `@ParameterizedTest` and other annotations needed.
 
-**9.2 Write a test for valid ticket codes**
+**9.2 Write a test for valid and invalid ticket codes**
 
 There is a `TODO` left in the `TicketTest` - a few test cases we have missed to implement!
 Let's try to make a test for them.
@@ -203,6 +205,10 @@ Let's try to make a test for them.
 For that you will need two things:
  - a "test template" method that will receive valid or invalid ticket codes as a parameter
  - a place where we get those (string values) - one of the [Sources of Arguments](https://junit.org/junit5/docs/current/user-guide/#writing-tests-parameterized-tests-sources). Can you guess which one?
+
+ You can start with two tests, one for valid and one for invalid Ticket codes. You just want to make sure a Ticket can be constructed.
+
+ You can use `Assertions.assertThrows` and `Assertions.doesNotThrow()` methods for this purpose.
 
 **9.3 Make one parameterized test for all valid tickets and another for all invalid ones**
 
@@ -236,6 +242,8 @@ void ticketAreNotValid(String label, LocalDateTime time, boolean isValid) {
 Note the parameters passed to the `@ParameterizedTest` annotation. You can customize the name.
 
 **10. Slow Tests**
+
+Migrate the "slow tests" as well.
 
 Integration tests are becoming very slow - simulate this by increasing the Thread.sleep timeout in both `SlowIntegrationTest` and `AnotherSlowIntegrationTest` to 12 seconds.
 
